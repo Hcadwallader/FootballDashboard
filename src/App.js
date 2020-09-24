@@ -1,20 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
-import { testData } from './services/FootballDataService';
+import { filterStats } from './services/FootballDataService';
 import { ResponsiveScatterPlot } from '@nivo/scatterplot';
 
 function App() {
-	//	const [teams, setTeams] = useState({});
-	//const [stats, setStats] = useState({});
 	const [filteredStats, setFilteredStats] = useState({});
 
 	useEffect(() => {
-		//const teamLookup = getTeams();
-		//	const statsLookup = getStats();
-		const filteredresults = testData();
-		//	setTeams(teamLookup);
-		//	setStats(statsLookup);
-		setFilteredStats(filteredresults);
+		const footballData = filterStats();
+		console.log(footballData);
+		setFilteredStats(footballData);
 	}, []);
 
 	return (
@@ -43,7 +38,7 @@ function App() {
 							tickSize: 5,
 							tickPadding: 5,
 							tickRotation: 0,
-							legend: 'weight',
+							legend: 'left',
 							legendPosition: 'middle',
 							legendOffset: 46,
 						}}
@@ -52,7 +47,7 @@ function App() {
 							tickSize: 5,
 							tickPadding: 5,
 							tickRotation: 0,
-							legend: 'size',
+							legend: 'right',
 							legendPosition: 'middle',
 							legendOffset: -60,
 						}}

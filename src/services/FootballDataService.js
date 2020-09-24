@@ -23,25 +23,17 @@ export const getTeams = () => {
 export const filterStats = () => {
 	let filteredStats = [];
 
-	// for (const g of Stats) {
-	// 	//console.log(g);
-	// 	filteredStats[g.player_id] = {
-	// 		left: g.left_foot_passes,
-	// 		right: g.right_foot_passes,
-	// 	};
-	// }
-
-	filteredStats['id'] = 'Group A';
-	filteredStats['data'] = [];
+	let currentStats = {};
+	currentStats['id'] = 'Group A';
+	currentStats['data'] = [];
 
 	for (const g of Stats) {
-		//console.log(g);
-		filteredStats.data.push({
+		currentStats.data.push({
 			x: g.left_foot_passes,
 			y: g.right_foot_passes,
 		});
 	}
-
+	filteredStats.push(currentStats);
 	return filteredStats;
 };
 
