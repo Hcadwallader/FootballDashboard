@@ -21,7 +21,7 @@ export const getTeams = () => {
 };
 
 export const filterStats = () => {
-	let filteredStats = {};
+	let filteredStats = [];
 
 	// for (const g of Stats) {
 	// 	//console.log(g);
@@ -31,8 +31,8 @@ export const filterStats = () => {
 	// 	};
 	// }
 
-	filteredStats.id = 'Group A';
-	filteredStats.data = [];
+	filteredStats['id'] = 'Group A';
+	filteredStats['data'] = [];
 
 	for (const g of Stats) {
 		//console.log(g);
