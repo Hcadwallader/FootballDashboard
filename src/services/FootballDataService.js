@@ -40,3 +40,155 @@ export const filterStats = () => {
 export const testData = () => {
 	return TestData;
 };
+
+export const mapTeams = () => {
+	let playersByTeam = [];
+	let players,
+		stats,
+		mappedPlayer = null;
+	Teams.map((t) => {
+		let mappedMatches = [];
+		let currentTeam = {};
+		// console.log('looking at ' + t.team_name);
+		players = filterPlayersByCountry(t.team_name);
+		stats = filterStatsByCountry(t.team_id);
+		let matches = filterMatchesByCountry(t.team_id);
+
+		// console.log('matches found: ' + matches.length);
+		matches.map((m) => {
+			let mappedMatch = processMatchData(m, t.team_id);
+			mappedMatches.push(mappedMatch);
+			return mappedMatches;
+		});
+		// console.log('mappedMatches found: ' + mappedMatches.length);
+		let winPercentage = calculateWinPercentage(mappedMatches);
+		mappedPlayer = handledPlayersMapping(players, stats);
+		currentTeam = mapCountry(t, mappedPlayer, mappedMatches, winPercentage);
+		playersByTeam.push(currentTeam);
+		return playersByTeam;
+	});
+	return playersByTeam;
+};
+
+const filterPlayersByCountry = (currentCountry) => {
+	return Players.filter((p) => p.country_name === currentCountry);
+};
+
+const filterStatsByCountry = (countryId) => {
+	return Stats.filter((s) => s.team_id === countryId);
+};
+
+const filterMatchesByCountry = (countryId) => {
+	return Matches.filter(
+		(m) =>
+			m.match_home_team_id === countryId ||
+			m.match_away_team_id === countryId
+	);
+};
+
+const processMatchData = (match, countryId) => {
+	let isHomeTeam = match.match_home_team_id === countryId;
+
+	let result = checkScore(match.match_home_score, match.match_away_score);
+	if (result === null) {
+		result = checkScore(
+			match.match_home_penalty_score,
+			match.match_away_penalty_score
+		);
+	}
+	let matchResult = {
+		isHomeTeam: isHomeTeam,
+		result: (isHomeTeam && result) || (!isHomeTeam && !result) ? 'W' : 'L',
+	};
+	// console.log(
+	// 	'match [score=' +
+	// 		match.match_home_score +
+	// 		'-' +
+	// 		match.match_away_score +
+	// 		'[' +
+	// 		match.match_home_penalty_score +
+	// 		'-' +
+	// 		match.match_away_penalty_score +
+	// 		']' +
+	// 		' country_id=' +
+	// 		countryId +
+	// 		' home_team=' +
+	// 		match.match_home_team_id +
+	// 		' isHomeTeam=' +
+	// 		isHomeTeam +
+	// 		' result=' +
+	// 		result +
+	// 		' matchResult=[' +
+	// 		matchResult.isHomeTeam +
+	// 		', ' +
+	// 		matchResult.result +
+	// 		']'
+	// );
+	return matchResult;
+};
+
+const calculateWinPercentage = (mappedMatches) => {
+	let matchCount = mappedMatches.length;
+	console.log('matchCount' + matchCount);
+	let noOfWins = mappedMatches.filter((m) => m.result === 'W').length;
+	console.log('no of wins' + noOfWins);
+	return (noOfWins / matchCount) * 100;
+};
+
+const checkScore = (homeScore, awayScore) => {
+	let result = null;
+	if (homeScore !== awayScore) {
+		return homeScore > awayScore;
+	}
+	return result;
+};
+
+const handledPlayersMapping = (players, stats) => {
+	let mappedPlayers = [];
+	for (let s in stats) {
+		let matchingPlayer = filterPlayersByPlayerId(
+			players,
+			stats[s].player_id
+		);
+		let currentPlayer = mapPlayer(stats[s], matchingPlayer[0]);
+		mappedPlayers.push(currentPlayer);
+	}
+	return mappedPlayers;
+};
+
+const filterPlayersByPlayerId = (players, statvalue) => {
+	return players.filter((p) => p.player_id === statvalue);
+};
+
+const mapPlayer = (stat, player) => {
+	return {
+		name: player.player_known_name
+			? player.player_known_name
+			: player.player_name,
+		id: player.player_id,
+		matchId: stat.match_id,
+		minutesPlayed: stat.minutes_played,
+		teamPossessionPercentage: stat.team_possession_percentage,
+		expectedGoals: stat.xg,
+		shots: stat.shots,
+		goals: stat.goals,
+		tackles: stat.tackles,
+		interceptions: stat.interceptions,
+		pressures: stat.pressures,
+		passes: stat.passes,
+		completedPasses: stat.completed_passes,
+		leftFootPasses: stat.left_foot_passes,
+		rightFootPasses: stat.right_foot_passes,
+		shotsFaced: stat.player_shots_faced,
+	};
+};
+const mapCountry = (team, players, matches, winPercentage) => {
+	let currentTeam = {};
+	currentTeam['name'] = team.team_name;
+	currentTeam['id'] = team.team_id;
+	currentTeam['colour'] = team.team_first_color;
+	currentTeam['players'] = players;
+	currentTeam['matches'] = matches;
+	currentTeam['winPercentage'] = winPercentage;
+	return currentTeam;
+};

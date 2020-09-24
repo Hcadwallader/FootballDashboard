@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
-import { filterStats } from './services/FootballDataService';
+import { filterStats, mapTeams } from './services/FootballDataService';
 import { ResponsiveScatterPlot } from '@nivo/scatterplot';
 
 function App() {
 	const [filteredStats, setFilteredStats] = useState({});
+	const [playersByTeam, setPlayersByTeam] = useState({});
 
 	useEffect(() => {
 		const footballData = filterStats();
-		console.log(footballData);
+		const data = mapTeams();
+		setPlayersByTeam(data);
+		//	console.log(footballData);
 		setFilteredStats(footballData);
 	}, []);
 
