@@ -44,25 +44,21 @@ export const testData = () => {
 export const mapTeams = () => {
 	let playersByTeam = [];
 	let players,
-		stats,
-		mappedPlayer = null;
+		stats = null;
 	Teams.map((t) => {
 		let mappedMatches = [];
 		let currentTeam = {};
-		// console.log('looking at ' + t.team_name);
 		players = filterPlayersByCountry(t.team_name);
 		stats = filterStatsByCountry(t.team_id);
 		let matches = filterMatchesByCountry(t.team_id);
 
-		// console.log('matches found: ' + matches.length);
 		matches.map((m) => {
 			let mappedMatch = processMatchData(m, t.team_id);
 			mappedMatches.push(mappedMatch);
 			return mappedMatches;
 		});
-		// console.log('mappedMatches found: ' + mappedMatches.length);
 		let winPercentage = calculateWinPercentage(mappedMatches);
-		mappedPlayer = handledPlayersMapping(players, stats);
+		let mappedPlayer = handledPlayersMapping(players, stats);
 		currentTeam = mapCountry(t, mappedPlayer, mappedMatches, winPercentage);
 		playersByTeam.push(currentTeam);
 		return playersByTeam;
@@ -100,38 +96,13 @@ const processMatchData = (match, countryId) => {
 		isHomeTeam: isHomeTeam,
 		result: (isHomeTeam && result) || (!isHomeTeam && !result) ? 'W' : 'L',
 	};
-	// console.log(
-	// 	'match [score=' +
-	// 		match.match_home_score +
-	// 		'-' +
-	// 		match.match_away_score +
-	// 		'[' +
-	// 		match.match_home_penalty_score +
-	// 		'-' +
-	// 		match.match_away_penalty_score +
-	// 		']' +
-	// 		' country_id=' +
-	// 		countryId +
-	// 		' home_team=' +
-	// 		match.match_home_team_id +
-	// 		' isHomeTeam=' +
-	// 		isHomeTeam +
-	// 		' result=' +
-	// 		result +
-	// 		' matchResult=[' +
-	// 		matchResult.isHomeTeam +
-	// 		', ' +
-	// 		matchResult.result +
-	// 		']'
-	// );
+
 	return matchResult;
 };
 
 const calculateWinPercentage = (mappedMatches) => {
 	let matchCount = mappedMatches.length;
-	console.log('matchCount' + matchCount);
 	let noOfWins = mappedMatches.filter((m) => m.result === 'W').length;
-	console.log('no of wins' + noOfWins);
 	return (noOfWins / matchCount) * 100;
 };
 
