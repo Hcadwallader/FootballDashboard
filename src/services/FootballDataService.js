@@ -20,25 +20,60 @@ export const getTeams = () => {
 	return Teams;
 };
 
-export const filterStats = () => {
-	let filteredStats = [];
+// export const filterStats = () => {
+// 	let filteredStats = [];
 
-	let currentStats = {};
-	currentStats['id'] = 'Group A';
-	currentStats['data'] = [];
+// 	let currentStats = {};
+// 	currentStats['id'] = 'Group A';
+// 	currentStats['data'] = [];
 
-	for (const g of Stats) {
-		currentStats.data.push({
-			x: g.left_foot_passes,
-			y: g.right_foot_passes,
-		});
-	}
-	filteredStats.push(currentStats);
-	return filteredStats;
+// 	for (const g of Stats) {
+// 		currentStats.data.push({
+// 			x: g.left_foot_passes,
+// 			y: g.right_foot_passes,
+// 		});
+// 	}
+// 	filteredStats.push(currentStats);
+// 	return filteredStats;
+// };
+
+// export const testData = () => {
+// 	return TestData;
+// };
+
+export const getCountries = () => {
+	let countryList = [];
+	Teams.map((t) => {
+		return countryList.push(t.team_name);
+	});
+	return countryList;
 };
 
-export const testData = () => {
-	return TestData;
+export const filterStats = (playersByTeam) => {
+	let filteredStats = [];
+	for (let p in playersByTeam) {
+		let currentStats = {};
+		currentStats['id'] = playersByTeam[p].name;
+		currentStats['data'] = [];
+		for (let player in playersByTeam[p].players) {
+			//console.log(playersByTeam[p].players);
+			// if (playersByTeam[p].winPercentage > 0) {
+			// 	currentStats.data.push({
+			// 		x: playersByTeam[p].players[player].leftFootPasses,
+			// 		y: playersByTeam[p].players[player].rightFootPasses,
+			// 	});
+			// }
+			let currentPlayer = playersByTeam[p].players[player];
+			currentStats.data.push({
+				x: (currentPlayer.leftFootPasses / currentPlayer.passes) * 100,
+				y: (currentPlayer.rightFootPasses / currentPlayer.passes) * 100,
+			});
+		}
+		//console.log(playersByTeam[p]);
+		filteredStats.push(currentStats);
+	}
+	console.log(filteredStats);
+	return filteredStats;
 };
 
 export const mapTeams = () => {
