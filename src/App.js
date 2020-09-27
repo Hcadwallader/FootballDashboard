@@ -4,7 +4,6 @@ import {
 	mapTeams,
 	filterStats,
 	getCountries,
-	testData,
 	filterCountriesByWinPercentage,
 } from './services/FootballDataService';
 import { ResponsiveScatterPlot } from '@nivo/scatterplot';
@@ -16,17 +15,13 @@ function App() {
 	const [playersByTeam, setPlayersByTeam] = useState({});
 	const [currentTeam, setCurrentTeam] = useState('all');
 	const [countryList, setCountryList] = useState({});
-	const [exampleData, setExampleData] = useState({});
 	const [radarData, setRadarData] = useState({});
 
 	useEffect(() => {
-		//const footballData = filterStats();
 		const countryData = getCountries();
 		setCountryList(countryData);
 		const data = mapTeams();
 		setPlayersByTeam(data);
-		//	console.log(footballData);
-		setExampleData(testData());
 		const footballData = filterStats(data);
 		setFilteredStats(footballData);
 		setOriginalStats(footballData);
