@@ -197,6 +197,7 @@ const mapPlayer = (stat, player) => {
 		shotsFaced: stat.player_shots_faced,
 	};
 };
+
 const mapCountry = (team, players, matches, winPercentage) => {
 	let currentTeam = {};
 	currentTeam['name'] = team.team_name;
