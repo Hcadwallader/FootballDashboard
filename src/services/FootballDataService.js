@@ -2,45 +2,8 @@ import { Matches } from './Data/MatchData';
 import { Players } from './Data/PlayerData';
 import { Stats } from './Data/StatsData';
 import { Teams } from './Data/TeamData';
-import { TestData } from './Data/TestData';
 
-export const getMatches = () => {
-	return Matches;
-};
-
-export const getPlayers = () => {
-	return Players;
-};
-
-export const getStats = () => {
-	return Stats;
-};
-
-export const getTeams = () => {
-	return Teams;
-};
-
-// export const filterStats = () => {
-// 	let filteredStats = [];
-
-// 	let currentStats = {};
-// 	currentStats['id'] = 'Group A';
-// 	currentStats['data'] = [];
-
-// 	for (const g of Stats) {
-// 		currentStats.data.push({
-// 			x: g.left_foot_passes,
-// 			y: g.right_foot_passes,
-// 		});
-// 	}
-// 	filteredStats.push(currentStats);
-// 	return filteredStats;
-// };
-
-export const testData = () => {
-	return TestData;
-};
-
+// public methods
 export const getCountries = () => {
 	let countryList = [];
 	Teams.map((t) => {
@@ -58,7 +21,6 @@ export const filterCountriesByWinPercentage = (
 			filteredTeams.push(playersByTeam[team]);
 		}
 	}
-	console.log(filteredTeams);
 
 	let radarData = [];
 
@@ -68,9 +30,55 @@ export const filterCountriesByWinPercentage = (
 	radarData.push(filterDataByAttribute('shots', filteredTeams));
 	radarData.push(filterDataByAttribute('passes', filteredTeams));
 
-	// radarData.push(currentItem);
 	return radarData;
 };
+
+export const mapTeams = () => {
+	let playersByTeam = [];
+	let players,
+		stats = null;
+	Teams.map((t) => {
+		let mappedMatches = [];
+		let currentTeam = {};
+		players = filterPlayersByCountry(t.team_name);
+		stats = filterStatsByCountry(t.team_id);
+		let matches = filterMatchesByCountry(t.team_id);
+
+		matches.map((m) => {
+			let mappedMatch = processMatchData(m, t.team_id);
+			mappedMatches.push(mappedMatch);
+			return mappedMatches;
+		});
+		let winPercentage = calculateWinPercentage(mappedMatches);
+		let mappedPlayer = handledPlayersMapping(players, stats);
+		currentTeam = mapCountry(t, mappedPlayer, mappedMatches, winPercentage);
+		playersByTeam.push(currentTeam);
+		return playersByTeam;
+	});
+	return playersByTeam;
+};
+
+export const filterStats = (playersByTeam) => {
+	let filteredStats = [];
+	for (let p in playersByTeam) {
+		let currentStats = {};
+		currentStats['id'] = playersByTeam[p].name;
+		currentStats['data'] = [];
+		for (let player in playersByTeam[p].players) {
+			let currentPlayer = playersByTeam[p].players[player];
+			currentStats.data.push({
+				x: (currentPlayer.leftFootPasses / currentPlayer.passes) * 100,
+				y: (currentPlayer.rightFootPasses / currentPlayer.passes) * 100,
+			});
+		}
+		filteredStats.push(currentStats);
+	}
+	return filteredStats;
+};
+
+// end of public methods
+
+//private methods
 
 const filterDataByAttribute = (attribute, teams) => {
 	let maxValue = -1;
@@ -99,58 +107,6 @@ const filterTeamByAttribute = (team, attribute) => {
 		attributeCount += team.players[player][attribute];
 	}
 	return parseFloat((attributeCount / playerCount).toFixed(2));
-};
-
-export const filterStats = (playersByTeam) => {
-	let filteredStats = [];
-	for (let p in playersByTeam) {
-		let currentStats = {};
-		currentStats['id'] = playersByTeam[p].name;
-		currentStats['data'] = [];
-		for (let player in playersByTeam[p].players) {
-			//console.log(playersByTeam[p].players);
-			// if (playersByTeam[p].winPercentage > 0) {
-			// 	currentStats.data.push({
-			// 		x: playersByTeam[p].players[player].leftFootPasses,
-			// 		y: playersByTeam[p].players[player].rightFootPasses,
-			// 	});
-			// }
-			let currentPlayer = playersByTeam[p].players[player];
-			currentStats.data.push({
-				x: (currentPlayer.leftFootPasses / currentPlayer.passes) * 100,
-				y: (currentPlayer.rightFootPasses / currentPlayer.passes) * 100,
-			});
-		}
-		//console.log(playersByTeam[p]);
-		filteredStats.push(currentStats);
-	}
-	console.log(filteredStats);
-	return filteredStats;
-};
-
-export const mapTeams = () => {
-	let playersByTeam = [];
-	let players,
-		stats = null;
-	Teams.map((t) => {
-		let mappedMatches = [];
-		let currentTeam = {};
-		players = filterPlayersByCountry(t.team_name);
-		stats = filterStatsByCountry(t.team_id);
-		let matches = filterMatchesByCountry(t.team_id);
-
-		matches.map((m) => {
-			let mappedMatch = processMatchData(m, t.team_id);
-			mappedMatches.push(mappedMatch);
-			return mappedMatches;
-		});
-		let winPercentage = calculateWinPercentage(mappedMatches);
-		let mappedPlayer = handledPlayersMapping(players, stats);
-		currentTeam = mapCountry(t, mappedPlayer, mappedMatches, winPercentage);
-		playersByTeam.push(currentTeam);
-		return playersByTeam;
-	});
-	return playersByTeam;
 };
 
 const filterPlayersByCountry = (currentCountry) => {
@@ -218,6 +174,9 @@ const filterPlayersByPlayerId = (players, statvalue) => {
 	return players.filter((p) => p.player_id === statvalue);
 };
 
+// end of private methods
+
+// mappers
 const mapPlayer = (stat, player) => {
 	return {
 		name: player.player_known_name
@@ -250,3 +209,5 @@ const mapCountry = (team, players, matches, winPercentage) => {
 	currentTeam['winPercentage'] = winPercentage;
 	return currentTeam;
 };
+
+// end of mappers
