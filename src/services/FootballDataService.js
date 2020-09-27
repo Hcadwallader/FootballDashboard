@@ -37,9 +37,9 @@ export const getTeams = () => {
 // 	return filteredStats;
 // };
 
-// export const testData = () => {
-// 	return TestData;
-// };
+export const testData = () => {
+	return TestData;
+};
 
 export const getCountries = () => {
 	let countryList = [];
@@ -47,6 +47,58 @@ export const getCountries = () => {
 		return countryList.push(t.team_name);
 	});
 	return countryList;
+};
+export const filterCountriesByWinPercentage = (
+	winPercentageRequired,
+	playersByTeam
+) => {
+	let filteredTeams = [];
+	for (let team in playersByTeam) {
+		if (playersByTeam[team].winPercentage > winPercentageRequired) {
+			filteredTeams.push(playersByTeam[team]);
+		}
+	}
+	console.log(filteredTeams);
+
+	let radarData = [];
+
+	radarData.push(filterDataByAttribute('pressures', filteredTeams));
+	radarData.push(filterDataByAttribute('tackles', filteredTeams));
+	radarData.push(filterDataByAttribute('interceptions', filteredTeams));
+	radarData.push(filterDataByAttribute('shots', filteredTeams));
+	radarData.push(filterDataByAttribute('passes', filteredTeams));
+
+	// radarData.push(currentItem);
+	return radarData;
+};
+
+const filterDataByAttribute = (attribute, teams) => {
+	let maxValue = -1;
+	let currentItem = {};
+	currentItem['attribute'] = attribute;
+	for (let t in teams) {
+		let totalPerTeam = filterTeamByAttribute(teams[t], attribute);
+		currentItem[teams[t].name] = totalPerTeam;
+		if (totalPerTeam > maxValue) {
+			maxValue = totalPerTeam;
+		}
+	}
+
+	for (let t in teams) {
+		currentItem[teams[t].name] = Math.round(
+			(currentItem[teams[t].name] / maxValue) * 100
+		);
+	}
+	return currentItem;
+};
+
+const filterTeamByAttribute = (team, attribute) => {
+	let attributeCount = 0;
+	let playerCount = team.players.length;
+	for (let player in team.players) {
+		attributeCount += team.players[player][attribute];
+	}
+	return parseFloat((attributeCount / playerCount).toFixed(2));
 };
 
 export const filterStats = (playersByTeam) => {
