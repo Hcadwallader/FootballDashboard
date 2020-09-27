@@ -12,6 +12,16 @@ code {
 		monospace;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+	color: black;
+}
+
 button {
 	background: #8bc34a;
 	border: 1px solid #8bc34a;
@@ -49,4 +59,5 @@ select {
 
 .form-spacing {
 	margin-left: 15px;
+	margin-top: 25px;
 }
