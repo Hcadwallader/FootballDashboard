@@ -11,10 +11,8 @@ export const getCountries = () => {
 	});
 	return countryList;
 };
-export const filterCountriesByWinPercentage = (
-	winPercentageRequired,
-	playersByTeam
-) => {
+
+export const getRadarData = (winPercentageRequired, playersByTeam) => {
 	let filteredTeams = [];
 	for (let team in playersByTeam) {
 		if (playersByTeam[team].winPercentage > winPercentageRequired) {
@@ -33,7 +31,7 @@ export const filterCountriesByWinPercentage = (
 	return radarData;
 };
 
-export const mapTeams = () => {
+export const groupDataByCountry = () => {
 	let playersByTeam = [];
 	let players,
 		stats = null;
@@ -58,7 +56,7 @@ export const mapTeams = () => {
 	return playersByTeam;
 };
 
-export const filterStats = (playersByTeam) => {
+export const getScatterPlotData = (playersByTeam) => {
 	let filteredStats = [];
 	for (let p in playersByTeam) {
 		let currentStats = {};
@@ -199,6 +197,7 @@ const mapPlayer = (stat, player) => {
 		shotsFaced: stat.player_shots_faced,
 	};
 };
+
 const mapCountry = (team, players, matches, winPercentage) => {
 	let currentTeam = {};
 	currentTeam['name'] = team.team_name;

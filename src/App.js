@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import {
-	mapTeams,
-	filterStats,
+	groupDataByCountry,
+	getScatterPlotData,
 	getCountries,
-	filterCountriesByWinPercentage,
+	getRadarData,
 } from './services/FootballDataService';
 import { ResponsiveScatterPlot } from '@nivo/scatterplot';
 import { ResponsiveRadar } from '@nivo/radar';
 
 function App() {
-	const [filteredStats, setFilteredStats] = useState({});
-	const [originalStats, setOriginalStats] = useState({});
+	const [filteredScatterPlotData, setFilteredScatterPlotData] = useState({});
+	const [allScatterPlotData, setAllScatterPlotData] = useState({});
 	const [playersByTeam, setPlayersByTeam] = useState({});
 	const [currentTeam, setCurrentTeam] = useState('all');
 	const [countryList, setCountryList] = useState({});
@@ -20,31 +20,31 @@ function App() {
 	useEffect(() => {
 		const countryData = getCountries();
 		setCountryList(countryData);
-		const data = mapTeams();
-		setPlayersByTeam(data);
-		const footballData = filterStats(data);
-		setFilteredStats(footballData);
-		setOriginalStats(footballData);
-		let test = filterCountriesByWinPercentage(50, data);
-		setRadarData(test);
+		const teamData = groupDataByCountry();
+		setPlayersByTeam(teamData);
+		const scatterPlotData = getScatterPlotData(teamData);
+		setFilteredScatterPlotData(scatterPlotData);
+		setAllScatterPlotData(scatterPlotData);
+		let radarDataByTeam = getRadarData(50, teamData);
+		setRadarData(radarDataByTeam);
 	}, []);
 
 	const handleFilterTeam = (e) => {
 		if (e.target.value === 'all') {
-			setFilteredStats(originalStats);
+			setFilteredScatterPlotData(allScatterPlotData);
 			setCurrentTeam(e.target.value);
 			return;
 		}
 		let newChartData = [];
 		setCurrentTeam(e.target.value);
-		let newStats = originalStats.find((f) => f.id === e.target.value);
+		let newStats = allScatterPlotData.find((f) => f.id === e.target.value);
 		newChartData.push(newStats);
-		setFilteredStats(newChartData);
+		setFilteredScatterPlotData(newChartData);
 	};
 
 	const resetGraph = (e) => {
 		setCurrentTeam('all');
-		setFilteredStats(originalStats);
+		setFilteredScatterPlotData(allScatterPlotData);
 	};
 
 	return (
@@ -77,7 +77,7 @@ function App() {
 							Reset graph
 						</button>
 						<ResponsiveScatterPlot
-							data={filteredStats}
+							data={filteredScatterPlotData}
 							margin={{
 								top: 60,
 								right: 140,
